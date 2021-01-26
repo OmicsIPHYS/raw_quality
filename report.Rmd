@@ -1,0 +1,45 @@
+---
+title: "LC-MS/MS Raw Files report"
+output: pdf_document
+params:
+  file1 : NA
+---
+
+```{r}
+
+PlotMzDistribution(params$file1)
+```
+
+
+
+```{r}
+
+rawDiag::PlotInjectionTime(params$file1)
+```
+
+
+
+```{r}
+ rawDiag::PlotCycleTime(params$file1)
+
+```
+
+```{r}
+rawDiag::PlotMassDistribution(params$file1)
+```
+
+```{r}
+rawDiag::PlotScanTime(params$file1)
+```
+
+
+```{r}
+rawDiag::PlotChargeState(params$file1)
+```
+
+
+```{r}
+ rawDiag::PlotTicBasepeak(params$file1)
+```
+
+
