@@ -5,41 +5,60 @@ params:
   file1 : NA
 ---
 
-```{r}
-
-PlotMzDistribution(params$file1)
-```
 
 
-
-```{r}
-
-rawDiag::PlotInjectionTime(params$file1)
-```
-
-
-
-```{r}
- rawDiag::PlotCycleTime(params$file1)
+```{r, results='asis', echo=FALSE, , fig.height=3}
+for (i in 1:length(params$file1)) {
+  
+  print(PlotMzDistribution(params$file1[[i]]))
+  
+}
 
 ```
 
-```{r}
-rawDiag::PlotMassDistribution(params$file1)
+
+```{r, results='asis', echo=FALSE, , fig.height=3}
+for (i in 1:length(params$file1)) {
+  
+  print(PlotInjectionTime(params$file1[[i]]))
+  
+}
+
 ```
 
-```{r}
-rawDiag::PlotScanTime(params$file1)
+```{r, results='asis', echo=FALSE, , fig.height=3}
+for (i in 1:length(params$file1)) {
+  
+  print(PlotCycleTime(params$file1[[i]]))
+  
+}
+
 ```
 
+```{r, results='asis', echo=FALSE, , fig.height=3}
+for (i in 1:length(params$file1)) {
+  
+  print(PlotScanTime(params$file1[[i]]))
+  
+}
 
-```{r}
-rawDiag::PlotChargeState(params$file1)
 ```
 
+```{r, results='asis', echo=FALSE, , fig.height=3}
+for (i in 1:length(params$file1)) {
+  
+  print(PlotChargeState(params$file1[[i]]))
+  
+}
 
-```{r}
- rawDiag::PlotTicBasepeak(params$file1)
 ```
 
+```{r, results='asis', echo=FALSE, , fig.height=3}
+for (i in 1:length(params$file1)) {
+  
+  print(PlotTicBasepeak(params$file1[[i]]))
+  
+}
+
+```
 
