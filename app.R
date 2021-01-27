@@ -4,25 +4,30 @@ library(readr)
 
 shinyApp(
   ui = fluidPage(
-    fileInput(inputId = 'rawfile',label = 'Insert the raw file,'),
+    fileInput(inputId = 'rawfiles',label = 'Insert the raw file,', multiple = TRUE),
     downloadButton("report", "Generate report")
   ),
   server = function(input, output) {
     options(shiny.maxRequestSize=100*1024^5)
     
     RAW <- reactive({
+      #req(input$files)
+      upload = list()
+      #inFile <- input$rawfile
+      
+      #if (is.null(inFile))
+       # return(NULL)
+      
+      for(i in 1:length(input$rawfiles[,1])){
+        upload[[i]] <- read.raw(input$rawfiles[[i, 'datapath']])
+      }
       
       
-      inFile <- input$rawfile
-      
-      if (is.null(inFile))
-        return(NULL)
-      
-      tb1 <- read.raw(inFile$datapath)
+      #tb1 <- read.raw(inFile$datapath)
       
 
       
-      return(tb1)
+      return(upload)
       
     })
 
@@ -40,10 +45,11 @@ shinyApp(
         file.copy("report.Rmd", tempReport, overwrite = TRUE)
         
         # Set up parameters to pass to Rmd document
+        ##params <- list(file1 = RAW()[[1]])
         params <- list(file1 = RAW())
         
         # Knit the document, passing in the `params` list, and eval it in a
-        # child of the global environment (this isolates the code in the document
+        # child of the global environment (this isolates the code in the documenta
         # from the code in this app).
         rmarkdown::render(tempReport, output_file = file,
                           params = params,
