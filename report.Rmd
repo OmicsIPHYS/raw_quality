@@ -3,62 +3,60 @@ title: "LC-MS/MS Raw Files report"
 output: pdf_document
 params:
   file1 : NA
+  file2: NA
 ---
 
 
+```{r, results='asis', echo=FALSE}
 
-```{r, results='asis', echo=FALSE, , fig.height=3}
-for (i in 1:length(params$file1)) {
-  
-  print(PlotMzDistribution(params$file1[[i]]))
-  
-}
+knitr::kable(params$file2, format = 'markdown')
+```
+\newpage
+
+```{r, echo=FALSE, fig.height=8}
+
+print(PlotInjectionTime(params$file1))
+```
+
+\newpage
+
+```{r, echo=FALSE, fig.height=8}
+print(PlotMzDistribution(params$file1))
+```
+
+\newpage
+
+```{r, results='asis', fig.height=8}
+
+print(PlotCycleTime(params$file1))
+
 
 ```
 
+\newpage
 
-```{r, results='asis', echo=FALSE, , fig.height=3}
-for (i in 1:length(params$file1)) {
-  
-  print(PlotInjectionTime(params$file1[[i]]))
-  
-}
+```{r, echo=FALSE,results='asis',fig.height=8 }
 
-```
+print(PlotScanTime(params$file1))
 
-```{r, results='asis', echo=FALSE, , fig.height=3}
-for (i in 1:length(params$file1)) {
-  
-  print(PlotCycleTime(params$file1[[i]]))
-  
-}
 
 ```
 
-```{r, results='asis', echo=FALSE, , fig.height=3}
-for (i in 1:length(params$file1)) {
-  
-  print(PlotScanTime(params$file1[[i]]))
-  
-}
+\newpage
+
+```{r, echo=FALSE,results='asis', fig.height=8}
+print(PlotChargeState(params$file1))
+
 
 ```
 
-```{r, results='asis', echo=FALSE, , fig.height=3}
-for (i in 1:length(params$file1)) {
-  
-  print(PlotChargeState(params$file1[[i]]))
-  
-}
+\newpage
 
-```
+```{r,echo=FALSE, results='asis', fig.height=8}
 
-```{r, results='asis', echo=FALSE, , fig.height=3}
-for (i in 1:length(params$file1)) {
-  
-  print(PlotTicBasepeak(params$file1[[i]]))
-  
-}
+print(PlotTicBasepeak(params$file1))
+
+
 
 ```
 
