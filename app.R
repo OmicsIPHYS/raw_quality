@@ -1,38 +1,73 @@
 library(rawDiag)
-library(readr)
-
-
+library(rmarkdown)
+library(shiny)
+library(kableExtra)
+library(knitr)
 shinyApp(
   ui = fluidPage(
     fileInput(inputId = 'rawfiles',label = 'Insert the raw file,', multiple = TRUE),
+    #textInput(inputId = 'pattern', label = 'Insert pattern to remove:',value = ''),
     downloadButton("report", "Generate report")
   ),
   server = function(input, output) {
     options(shiny.maxRequestSize=100*1024^5)
-    
+    upload = list()
+
     RAW <- reactive({
-      #req(input$files)
-      upload = list()
-      #inFile <- input$rawfile
       
-      #if (is.null(inFile))
-       # return(NULL)
+      rawFileNames <- list()
+
       
-      for(i in 1:length(input$rawfiles[,1])){
-        upload[[i]] <- read.raw(input$rawfiles[[i, 'datapath']])
+      for (i in 1:length(input$rawfiles[,1])){
+        rawFileNames[[i]] <- read.raw(input$rawfiles[[i, 'datapath']])
+        # #create a list with the raw names of the file
+        # file_name<- c(file_name,input$rawfiles[[i]])
+        # 
+        # raw_name <- c(raw_name, rawFileNames[[i]]$filename)
+      }
+      
+      RAW <- plyr::rbind.fill(rawFileNames)
+
+      return(RAW)
+
+    })
+
+
+    table_names <- reactive({
+
+
+#################
+
+      raw_name = input$rawfiles$name
+#####################
+      
+      file_name = c()
+      rawFileNames <- list()
+      
+      for (i in 1:length(input$rawfiles[,1])){
+        rawFileNames[[i]] <- read.raw(input$rawfiles[[i, 'datapath']])
+        file_name <- append(file_name, rawFileNames[[i]]$filename) 
       }
       
       
-      #tb1 <- read.raw(inFile$datapath)
-      
+      file_name <- unique(file_name)
+      # for (i in 1:length(input$rawfiles[,1])){
+      #   rawFileNames[[i]] <- read.raw(input$rawfiles[[i, 'datapath']])
+      #   #create a list with the raw names of the file
+      #   file_name<- append(file_name,input$rawfiles[[i]])
+      # 
+      #   raw_name <- append(raw_name, rawFileNames[[i]]$filename)
+      # 
+      # }
+      #table_all <- data.frame(file_name, raw_name)
+      # vec1 <- 1:10
+      # vec2 <- letters[1:10]
+      #
+      table_all <-  data.frame(raw_name,file_name)
+      return(table_all)
 
-      
-      return(upload)
-      
     })
 
-    
-    
     output$report <- downloadHandler(
       
       # For PDF output, change this to "report.pdf"
@@ -46,7 +81,8 @@ shinyApp(
         
         # Set up parameters to pass to Rmd document
         ##params <- list(file1 = RAW()[[1]])
-        params <- list(file1 = RAW())
+        params <- list(file1 = RAW(), 
+                       file2=table_names())
         
         # Knit the document, passing in the `params` list, and eval it in a
         # child of the global environment (this isolates the code in the documenta
