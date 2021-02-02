@@ -3,6 +3,15 @@ library(rmarkdown)
 library(shiny)
 library(kableExtra)
 library(knitr)
+
+
+library(protViz)
+library(parallel)
+library(rawrr)
+
+library(dplyr)
+
+
 shinyApp(
   ui = fluidPage(
     fileInput(inputId = 'rawfiles',label = 'Insert the raw file,', multiple = TRUE),
@@ -30,6 +39,9 @@ shinyApp(
     })
 
 
+    
+    
+    
     table_names <- reactive({
 
 
@@ -57,6 +69,70 @@ shinyApp(
     ###irt peptides check and plot
     
     
+    RAW_irt <- reactive({
+      file <- input$rawfiles
+      
+      return(file$datapath)
+      
+    })
+    
+    #def function to get instrument model
+    .getInstrumentInformation <- function(x){data.frame(model=x$`Instrument model`,
+                                                        serialNumber=x$`Serial number`,
+                                                        #method=x$`Instrument method`,
+                                                        softwareVersion=x$`Software version`,
+                                                        nMS=x$`Number of scans`,
+                                                        nMS2=x$`Number of ms2 scans`)
+    }
+    
+    
+    #def function to plot both the chromatogram and the irt score
+    .plotChromatogramAndFit <- function(x, i){
+      par(mfrow=c(2,1))
+      
+      plot(x); legend("topright", legend=i, title='Instrument Model', bty = "n", cex=0.75)
+      
+      rt <- sapply(x, function(x) x$times[which.max(x$intensities)[1]])
+      if (length(rt) == length(iRT.score)){
+        fit <- lm(rt ~ iRT.score)
+        plot(rt ~ iRT.score, ylab = 'Retention time [min]',
+             xlab = "iRT score", pch=16, frame.plot = FALSE)
+        abline(fit, col = 'grey')
+        abline(v = 0, col = "grey", lty = 2)
+        legend("topleft",
+               legend = paste("Regression line: ", "rt =",
+                              format(coef(fit)[1], digits = 4), " + ",
+                              format(coef(fit)[2], digits = 2), "score", "\nR2: ",
+                              format(summary(fit)$r.squared, digits = 2)),
+               bty = "n", cex = 0.75)
+        text(iRT.score, rt,  iRT.mZ,pos=1,cex=0.5)
+      }
+    }
+    
+    
+    
+
+    
+    
+    
+    
+
+    
+ 
+    
+    
+    # if (input$irt_check ) {
+    #   
+    # 
+    #   
+    # 
+    #   
+    #   
+    # 
+    #   
+    #   
+    #   
+    # }
     
     
     
@@ -76,8 +152,14 @@ shinyApp(
         
         # Set up parameters to pass to Rmd document
         ##params <- list(file1 = RAW()[[1]])
-        params <- list(file1 = RAW(), 
-                       file2=table_names())
+        params <- list(RAW = RAW(), 
+                       table_names=table_names(),
+                       RAW_irt=RAW_irt()
+                       # iRT.mZ =iRT.mZ ,
+                       # iRT.score=iRT.score#,
+                       # H=H(),
+                       # instrumentInformation=instrumentInformation()
+                       )
         
         # Knit the document, passing in the `params` list, and eval it in a
         # child of the global environment (this isolates the code in the documenta
