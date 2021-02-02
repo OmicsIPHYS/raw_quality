@@ -2,33 +2,78 @@
 title: "LC-MS/MS Raw Files report"
 output: pdf_document
 params:
-  file1 : NA
-  file2: NA
+  RAW : NA
+  table_names: NA
+  RAW_irt: NA
+
+
 ---
 
 
 ```{r, results='asis', echo=FALSE}
 
-knitr::kable(params$file2, format = 'markdown')
+knitr::kable(params$table_names, format = 'markdown')
 ```
 \newpage
 
+```{r,echo=FALSE,}
+iRT.mZ <- c(487.2571, 547.2984, 622.8539, 636.8695, 644.8230, 669.8384,
+            683.8282, 683.8541, 699.3388, 726.8361, 776.9301)
+
+iRT.score <- c(-24.92, 19.79, 70.52, 87.23, 0, 28.71, 12.39, 33.38, 42.26,
+               54.62, 100)
+
+names(iRT.mZ) <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
+                   "GAGSSEPVTGLDAK", "TPVISGGPYEYR", "VEATFGVDESNAK",
+                   "TPVITGAPYEYR", "DGLDAASYYAPVR", "ADVTPADFSEWSK",
+                   "LFLQFGAQGSPFLK")
+```
+
+```{r,echo=FALSE,}
+H <- mclapply(FUN=rawrr::readFileHeader, params$RAW_irt)
+
+
+instrumentInformation <- do.call('rbind',lapply(H, .getInstrumentInformation))
+
+```
+
+
+
+```{r ,echo=FALSE, fig.height=8}
+C <- mclapply(X = params$RAW_irt,
+              FUN = rawrr::readChromatogram,
+              mass = iRT.mZ,
+              tol = 10,
+              type = "xic",
+              filter = "ms")
+
+
+# rv <- mapply(FUN=.plotChromatogramAndFit,
+#              x=C, i=instrumentInformation$model)
+
+rv <- mapply(FUN=.plotChromatogramAndFit,
+             x=C, i=instrumentInformation$model)
+
+```
+
+
+\newpage
 ```{r, echo=FALSE, fig.height=8}
 
-print(PlotInjectionTime(params$file1))
+print(PlotInjectionTime(params$RAW))
 ```
 
 \newpage
 
 ```{r, echo=FALSE, fig.height=8}
-print(PlotMzDistribution(params$file1))
+print(PlotMzDistribution(params$RAW))
 ```
 
 \newpage
 
 ```{r, results='asis', fig.height=8}
 
-print(PlotCycleTime(params$file1))
+print(PlotCycleTime(params$RAW))
 
 
 ```
@@ -37,7 +82,7 @@ print(PlotCycleTime(params$file1))
 
 ```{r, echo=FALSE,results='asis',fig.height=8 }
 
-print(PlotScanTime(params$file1))
+print(PlotScanTime(params$RAW))
 
 
 ```
@@ -45,7 +90,7 @@ print(PlotScanTime(params$file1))
 \newpage
 
 ```{r, echo=FALSE,results='asis', fig.height=8}
-print(PlotChargeState(params$file1))
+print(PlotChargeState(params$RAW))
 
 
 ```
@@ -54,9 +99,8 @@ print(PlotChargeState(params$file1))
 
 ```{r,echo=FALSE, results='asis', fig.height=8}
 
-print(PlotTicBasepeak(params$file1))
+print(PlotTicBasepeak(params$RAW))
 
 
 
 ```
-
