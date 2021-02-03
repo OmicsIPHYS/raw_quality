@@ -76,6 +76,21 @@ shinyApp(
       
     })
     
+    
+    irt_peptides_check <- reactive({
+      if(input$irt_check){
+        
+        a = TRUE
+      } else{
+        a=FALSE
+      }
+      return(a)
+    })
+    
+    
+    
+    
+    
     output$report <- downloadHandler(
       
       # For PDF output, change this to "report.pdf"
@@ -91,11 +106,8 @@ shinyApp(
         ##params <- list(file1 = RAW()[[1]])
         params <- list(RAW = RAW(), 
                        table_names=table_names(),
-                       RAW_irt=RAW_irt()
-                       # iRT.mZ =iRT.mZ ,
-                       # iRT.score=iRT.score#,
-                       # H=H(),
-                       # instrumentInformation=instrumentInformation()
+                       RAW_irt=RAW_irt(),
+                       irt_peptides_check=irt_peptides_check()
                        )
         
         # Knit the document, passing in the `params` list, and eval it in a
