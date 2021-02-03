@@ -16,6 +16,7 @@ shinyApp(
   ui = fluidPage(
     fileInput(inputId = 'rawfiles',label = 'Insert the raw file,', multiple = TRUE),
     checkboxInput(inputId = 'irt_check', label = 'Check for iRT peptides', value = FALSE),
+    sliderInput(inputId = 'cores', label = 'select number of cores:', min = 1, max = detectCores(), value = 1, step = 1),
     downloadButton("report", "Generate report")
   ),
   server = function(input, output) {
@@ -88,7 +89,11 @@ shinyApp(
     })
     
     
-    
+    number_cores <- reactive({
+      a <- input$cores
+      
+      return(a)
+    })
     
     
     output$report <- downloadHandler(
@@ -107,7 +112,8 @@ shinyApp(
         params <- list(RAW = RAW(), 
                        table_names=table_names(),
                        RAW_irt=RAW_irt(),
-                       irt_peptides_check=irt_peptides_check()
+                       irt_peptides_check=irt_peptides_check(),
+                       number_cores=number_cores()
                        )
         
         # Knit the document, passing in the `params` list, and eval it in a
