@@ -5,7 +5,8 @@ params:
   RAW : NA
   table_names: NA
   RAW_irt: NA
-
+  irt_peptides_check: NA
+  number_cores: NA
 
 ---
 
@@ -16,7 +17,7 @@ knitr::kable(params$table_names, format = 'markdown')
 ```
 \newpage
 
-```{r}
+```{r, echo=FALSE}
 iRT.mZ <- c(487.2571, 547.2984, 622.8539, 636.8695, 644.8230, 669.8384,
             683.8282, 683.8541, 699.3388, 726.8361, 776.9301)
 
@@ -29,7 +30,7 @@ names(iRT.mZ) <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
                    "LFLQFGAQGSPFLK")
 ```
 
-```{r}
+```{r, echo=FALSE}
 
 
 .getInstrumentInformation <- function(x){data.frame(model=x$`Instrument model`,
@@ -42,16 +43,16 @@ names(iRT.mZ) <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
 
 
 
-.plotChromatogramAndFit <- function(x, i){
+.plotChromatogramAndFit <-  function(x, i, ...){
     par(mfrow=c(2,1))
 
-    plot(x); legend("topright", legend=i, title='Instrument Model', bty = "n", cex=0.75)
+    plot(x, ...); legend("topright", legend=i, title='Instrument Model', bty = "n", cex=0.75)
 
     rt <- sapply(x, function(x) x$times[which.max(x$intensities)[1]])
     if (length(rt) == length(iRT.score)){
     fit <- lm(rt ~ iRT.score)
     plot(rt ~ iRT.score, ylab = 'Retention time [min]',
-         xlab = "iRT score", pch=16, frame.plot = FALSE)
+         xlab = "iRT score", pch=16, frame.plot = FALSE, ...)
     abline(fit, col = 'grey')
     abline(v = 0, col = "grey", lty = 2)
     legend("topleft",
@@ -67,31 +68,37 @@ names(iRT.mZ) <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
 
 
 
-H <- mclapply(FUN=rawrr::readFileHeader, params$RAW_irt)
 
-
-
-instrumentInformation <- do.call('rbind',lapply(H, .getInstrumentInformation))
 
 ```
 
 
 
 ```{r ,echo=FALSE, fig.height=8}
+if (params$irt_peptides_check==TRUE){
+
+
+    
+H <- mclapply(FUN=rawrr::readFileHeader, params$RAW_irt, mc.cores = params$number_cores)
+
+
+
+instrumentInformation <- do.call('rbind',lapply(H, .getInstrumentInformation))
+
 C <- mclapply(X = params$RAW_irt,
               FUN = rawrr::readChromatogram,
               mass = iRT.mZ,
               tol = 10,
               type = "xic",
-              filter = "ms")
+              filter = "ms", 
+              mc.cores = params$number_cores)
 
 
 rv <- mapply(FUN=.plotChromatogramAndFit,
-             x=C, i=instrumentInformation$model)
-
-# rv <- mapply(FUN=.plotChromatogramAndFit,
-#              x=C, i=instrumentInformation$model)
-
+             x=C, i=instrumentInformation$model, main=basename(params$RAW_irt))
+  
+  
+}
 ```
 
 
