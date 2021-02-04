@@ -6,7 +6,7 @@ params:
   table_names: NA
   RAW_irt: NA
   irt_peptides_check: NA
-  number_cores: NA
+  
 
 ---
 
@@ -79,7 +79,7 @@ if (params$irt_peptides_check==TRUE){
 
 
     
-H <- mclapply(FUN=rawrr::readFileHeader, params$RAW_irt, mc.cores = params$number_cores)
+H <- mclapply(FUN=rawrr::readFileHeader, params$RAW_irt)
 
 
 
@@ -90,8 +90,7 @@ C <- mclapply(X = params$RAW_irt,
               mass = iRT.mZ,
               tol = 10,
               type = "xic",
-              filter = "ms", 
-              mc.cores = params$number_cores)
+              filter = "ms")
 
 
 rv <- mapply(FUN=.plotChromatogramAndFit,
